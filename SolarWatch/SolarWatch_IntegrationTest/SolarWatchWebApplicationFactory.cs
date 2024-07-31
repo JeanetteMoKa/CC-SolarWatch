@@ -15,6 +15,7 @@ namespace SolarWatch_IntegrationTest;
 
       protected override void ConfigureWebHost(IWebHostBuilder builder)
       {
+          builder.UseEnvironment("Testing");
           builder.ConfigureServices(services =>
           {
               //Get the previous DbContextOptions registrations 
