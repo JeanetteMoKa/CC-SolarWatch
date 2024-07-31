@@ -93,8 +93,9 @@ public class MyControllerIntegrationTest
         
         var response = await loginResponse.Content.ReadAsStringAsync();
         output.WriteLine(response);
+        string expected = "{\"Bad credentials\":[\"Invalid password\"]}";
         // Assert
-        Assert.Contains("Invalid password", response);
+        Assert.Equal(expected, response);
     }
     
     [Fact]
@@ -107,7 +108,8 @@ public class MyControllerIntegrationTest
         
         var response = await loginResponse.Content.ReadAsStringAsync();
         output.WriteLine(response);
+        string expected = "{\"Bad credentials\":[\"Invalid email\"]}";
         // Assert
-        Assert.Contains("Invalid email", response);
+        Assert.Equal(expected, response);
     }
 }
