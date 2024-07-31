@@ -16,7 +16,7 @@ public class AuthenticationSeeder
         _configuration = configuration;
     }
 
-    public void AddRoles()
+    public async Task AddRoles()
     {
         var tAdmin = CreateAdminRole(roleManager);
         tAdmin.Wait();
@@ -28,13 +28,19 @@ public class AuthenticationSeeder
     private async Task CreateAdminRole(RoleManager<IdentityRole> roleManager)
     {
         var adminRole = _configuration["Roles:Admin"];
-        await roleManager.CreateAsync(new IdentityRole(adminRole));
+        if (!await roleManager.RoleExistsAsync(adminRole))
+        {
+            await roleManager.CreateAsync(new IdentityRole(adminRole));
+        }
     }
 
     private async Task CreateUserRole(RoleManager<IdentityRole> roleManager)
     {
         var userRole = _configuration["Roles:User"];
-        await roleManager.CreateAsync(new IdentityRole(userRole));
+        if (!await roleManager.RoleExistsAsync(userRole))
+        {
+            await roleManager.CreateAsync(new IdentityRole(userRole));
+        }
     }
 
     public void AddAdmin()

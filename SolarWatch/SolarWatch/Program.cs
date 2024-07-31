@@ -130,12 +130,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-using var
-    scope = app.Services
-        .CreateScope(); // AuthenticationSeeder is a scoped service, therefore we need a scope instance to access it
-var authenticationSeeder = scope.ServiceProvider.GetRequiredService<AuthenticationSeeder>();
-authenticationSeeder.AddRoles();
-authenticationSeeder.AddAdmin();
+using (var
+       scope = app.Services
+           .CreateScope())
+{
+    var authenticationSeeder = scope.ServiceProvider.GetRequiredService<AuthenticationSeeder>();
+    await authenticationSeeder.AddRoles();
+    authenticationSeeder.AddAdmin();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
