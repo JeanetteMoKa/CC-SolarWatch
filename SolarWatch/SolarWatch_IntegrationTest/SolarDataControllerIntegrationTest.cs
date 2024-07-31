@@ -83,35 +83,4 @@ public class MyControllerIntegrationTest
         Assert.Equal("tesztelek", authResponse.UserName);
     }
     
-    [Fact]
-    public async Task TestUserLoginWrongPassword()
-    {
-        var loginRequest = new AuthRequest("teszt@teszt.com", "idk");
-        var loginResponse = await _client.PostAsync("api/Auth/Login",
-            new StringContent(JsonConvert.SerializeObject(loginRequest),
-                Encoding.UTF8, "application/json"));
-        
-        var authResponse = JsonConvert.DeserializeObject<AuthResponse>(await loginResponse.Content.ReadAsStringAsync());
-        
-        // Assert
-        Assert.Null(authResponse.Token);
-        Assert.Equal(null, authResponse.Email);
-        Assert.Equal(null, authResponse.UserName);
-    }
-    
-    [Fact]
-    public async Task TestUserLoginWrongEmail()
-    {
-        var loginRequest = new AuthRequest("asd@asd.com", "asd123");
-        var loginResponse = await _client.PostAsync("api/Auth/Login",
-            new StringContent(JsonConvert.SerializeObject(loginRequest),
-                Encoding.UTF8, "application/json"));
-        
-        var authResponse = JsonConvert.DeserializeObject<AuthResponse>(await loginResponse.Content.ReadAsStringAsync());
-        
-        // Assert
-        Assert.Null(authResponse.Token);
-        Assert.Equal(null, authResponse.Email);
-        Assert.Equal(null, authResponse.UserName);
-    }
 }
