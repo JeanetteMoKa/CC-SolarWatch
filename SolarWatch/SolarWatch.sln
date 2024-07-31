@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolarWatch", "SolarWatch\SolarWatch.csproj", "{1F3EEC3C-B4ED-42BF-B097-89A898497753}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolarWatch_Tests", "SolarWatch_Tests\SolarWatch_Tests.csproj", "{C5072C00-8D5E-4A73-84EF-BD5E62B25EB5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B3CEC35E-5797-4D38-BE92-E8BDB4C0E5ED}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolarWatch_IntegrationTest", "SolarWatch_IntegrationTest\SolarWatch_IntegrationTest.csproj", "{C6555324-391E-458D-BA7F-4F2C80A28E9F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F3EEC3C-B4ED-42BF-B097-89A898497753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F3EEC3C-B4ED-42BF-B097-89A898497753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F3EEC3C-B4ED-42BF-B097-89A898497753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F3EEC3C-B4ED-42BF-B097-89A898497753}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5072C00-8D5E-4A73-84EF-BD5E62B25EB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5072C00-8D5E-4A73-84EF-BD5E62B25EB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5072C00-8D5E-4A73-84EF-BD5E62B25EB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5072C00-8D5E-4A73-84EF-BD5E62B25EB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6555324-391E-458D-BA7F-4F2C80A28E9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6555324-391E-458D-BA7F-4F2C80A28E9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6555324-391E-458D-BA7F-4F2C80A28E9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6555324-391E-458D-BA7F-4F2C80A28E9F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

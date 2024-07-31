@@ -1,0 +1,34 @@
+﻿services:
+  backend:
+    image: solarwatch_12
+    ports:
+      - 5106:5106
+    build:
+      context: .
+      dockerfile: SolarWatch/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - frontend_url=http://localhost
+      - CONNECTIONSTRINGS__DEFAULT=Server=db,1433;Database=SolarWatch;User Id=sa;Password=Ant34teR;Encrypt=False;
+    depends_on:
+      - db
+  
+  db:
+    image: mcr.microsoft.com/mssql/server:latest
+    ports:
+      - 1433:1433
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Ant34teR"
+  
+  solarwatch-frontend:
+    image: solarwatchfront01
+    build:
+      context: .
+      dockerfile: Frontend/Frontend.dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - PROXY_API=http://backend:5106
+    depends_on:
+      - backend

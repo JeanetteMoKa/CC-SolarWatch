@@ -1,0 +1,48 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: rgba(255, 255, 255, 0.87);
+  
+  background: rgb(33,45,106);
+  background: linear-gradient(180deg, rgba(33,45,106,1) 15%, rgba(190,78,130,1) 64%, rgba(251,255,207,1) 100%);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+
+canvas{
+  z-index: -1;
+}
+
+.formCont{
+  display: flex;
+  justify-content: center;
+}
+
+form label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 3px;
+  color: #212d6a;
+}
+
+.dataDisplay{
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+}
