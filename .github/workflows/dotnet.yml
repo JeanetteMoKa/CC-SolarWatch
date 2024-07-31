@@ -23,7 +23,13 @@ jobs:
         dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore
+      working-directory:     solarwatch-ci-csharp-JeanetteMoKa/SolarWatch/
+
     - name: Build
       run: dotnet build --no-restore
+      working-directory:     solarwatch-ci-csharp-JeanetteMoKa/SolarWatch/
+
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      working-directory:     solarwatch-ci-csharp-JeanetteMoKa/SolarWatch/
+
