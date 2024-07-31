@@ -71,15 +71,15 @@ namespace SolarWatch_IntegrationTest;
               var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
               var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
               
-              // // Add roles
-              // var roles = new[] { "Admin", "User" };
-              // foreach (var role in roles)
-              // {
-              //     if (!roleManager.RoleExistsAsync(role).GetAwaiter().GetResult())
-              //     {
-              //         roleManager.CreateAsync(new IdentityRole(role)).GetAwaiter().GetResult();
-              //     }
-              // }
+              // Add roles
+              var roles = new[] { "Admin", "User" };
+              foreach (var role in roles)
+              {
+                  if (!roleManager.RoleExistsAsync(role).GetAwaiter().GetResult())
+                  {
+                      roleManager.CreateAsync(new IdentityRole(role)).GetAwaiter().GetResult();
+                  }
+              }
 
               // Add users
               var adminUser = new IdentityUser { UserName = "admin", Email = "admin@admin.com" };
