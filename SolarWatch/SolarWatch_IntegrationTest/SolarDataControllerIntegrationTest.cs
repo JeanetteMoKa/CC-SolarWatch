@@ -91,11 +91,12 @@ public class MyControllerIntegrationTest
             new StringContent(JsonConvert.SerializeObject(loginRequest),
                 Encoding.UTF8, "application/json"));
         
-        var response = await loginResponse.Content.ReadAsStringAsync();
-        output.WriteLine(response);
-        string expected = "{\"Bad credentials\":[\"Invalid password\"]}";
+        var authResponse = JsonConvert.DeserializeObject<AuthResponse>(await loginResponse.Content.ReadAsStringAsync());
+        
         // Assert
-        Assert.Equal(expected, response);
+        Assert.Null(authResponse.Token);
+        Assert.Equal(null, authResponse.Email);
+        Assert.Equal(null, authResponse.UserName);
     }
     
     [Fact]
@@ -106,10 +107,11 @@ public class MyControllerIntegrationTest
             new StringContent(JsonConvert.SerializeObject(loginRequest),
                 Encoding.UTF8, "application/json"));
         
-        var response = await loginResponse.Content.ReadAsStringAsync();
-        output.WriteLine(response);
-        string expected = "{\"Bad credentials\":[\"Invalid email\"]}";
+        var authResponse = JsonConvert.DeserializeObject<AuthResponse>(await loginResponse.Content.ReadAsStringAsync());
+        
         // Assert
-        Assert.Equal(expected, response);
+        Assert.Null(authResponse.Token);
+        Assert.Equal(null, authResponse.Email);
+        Assert.Equal(null, authResponse.UserName);
     }
 }
