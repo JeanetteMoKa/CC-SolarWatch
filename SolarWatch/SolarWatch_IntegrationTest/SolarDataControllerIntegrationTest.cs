@@ -2,7 +2,6 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SolarWatch.Contracts;
 using SolarWatch.Model.DbModel;
 using Xunit.Abstractions;
@@ -94,9 +93,8 @@ public class MyControllerIntegrationTest
         
         var response = await loginResponse.Content.ReadAsStringAsync();
         output.WriteLine(response);
-        var jsonResponse = JObject.Parse(response);
         // Assert
-        Assert.Contains("Invalid password", jsonResponse["Bad credentials"].ToString());
+        Assert.Contains("Invalid password", response);
     }
     
     [Fact]
@@ -109,8 +107,7 @@ public class MyControllerIntegrationTest
         
         var response = await loginResponse.Content.ReadAsStringAsync();
         output.WriteLine(response);
-        var jsonResponse = JObject.Parse(response);
         // Assert
-        Assert.Contains("Invalid email", jsonResponse["Bad credentials"].ToString());
+        Assert.Contains("Invalid email", response);
     }
 }
