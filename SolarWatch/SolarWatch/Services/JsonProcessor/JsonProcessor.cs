@@ -32,6 +32,20 @@ public class JsonProcessor : IJsonProcessor
         return coordinate;
     }
 
+    public TimeZoneData ProcessTimeZoneData(string data)
+    {
+        
+        var json = JsonDocument.Parse(data);
+        var result = json.RootElement;
+
+        var timeZoneData = new TimeZoneData(
+            name: result.GetProperty("dstInterval").GetProperty("dstName").GetString(),
+            offsetSeconds: result.GetProperty("currentUtcOffset").GetProperty("seconds").GetInt32()
+        );
+
+        return timeZoneData;
+    }
+    
     private DateTime GetDate(string date)
     {
         return DateTime.Parse(date);

@@ -10,7 +10,7 @@ public class OpenWeatherGeocodingApi : ICityDataProvider
     
     private readonly ILogger<OpenWeatherGeocodingApi> _logger;
 
-    public OpenWeatherGeocodingApi(ILogger<OpenWeatherGeocodingApi> logger, IConfiguration configuration)
+    public OpenWeatherGeocodingApi(ILogger<OpenWeatherGeocodingApi> logger)
     {
         _logger = logger;
     }

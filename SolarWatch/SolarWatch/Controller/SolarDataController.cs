@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SolarWatch.Model.DbModel;
+using SolarWatch.Model.DTO;
 using SolarWatch.Services.CoordinatesApi;
 using SolarWatch.Services.JsonProcessor;
 using SolarWatch.Services.Repositories;
 using SolarWatch.Services.SolarApi;
+using SolarWatch.Services.TimeZone;
 
 namespace SolarWatch.Controller;
 
@@ -19,11 +21,12 @@ public class SolarDataController : ControllerBase
     private readonly ILogger<SolarDataController> _logger;
     private readonly ISolarDataProvider _solarDataProvider;
     private readonly ISolarDataRepository _solarDataRepository;
+    private readonly ITimeZoneQuery _timeZoneQuery;
 
     public SolarDataController(ILogger<SolarDataController> logger,
         ISolarDataProvider solarDataProvider, IJsonProcessor jsonProcessor,
         ISolarDataRepository solarDataRepository, ICityRepository cityRepository,
-        ICityDataProvider cityDataProvider)
+        ICityDataProvider cityDataProvider, ITimeZoneQuery timeZoneQuery)
     {
         _logger = logger;
         _solarDataProvider = solarDataProvider;
@@ -31,6 +34,7 @@ public class SolarDataController : ControllerBase
         _solarDataRepository = solarDataRepository;
         _cityRepository = cityRepository;
         _cityDataProvider = cityDataProvider;
+        _timeZoneQuery = timeZoneQuery;
     }
 
     [HttpGet("{cityName}/{date:datetime}")]
@@ -64,6 +68,9 @@ public class SolarDataController : ControllerBase
 
             var solarData = await _solarDataRepository.GetByCityByDate(city, date);
 
+            var timeZoneData = await _timeZoneQuery.GetTimeZone(city);
+            var timeZone = _jsonProcessor.ProcessTimeZoneData(timeZoneData);
+
             if (solarData == null)
             {
                     var solarDataRaw = await _solarDataProvider.GetCurrent(city, date);
@@ -77,10 +84,14 @@ public class SolarDataController : ControllerBase
                     };
 
                     await _solarDataRepository.Add(solarData);
-                
             }
 
-            return Ok(solarData);
+            var toSend = new SolarDataWTimeZoneDto
+            {
+                SolarData = solarData,
+                TimeZoneData = timeZone
+            };
+            return Ok(toSend);
         }
         catch (Exception e)
         {
