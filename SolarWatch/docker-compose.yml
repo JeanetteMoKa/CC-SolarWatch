@@ -1,6 +1,6 @@
 ﻿services:
   backend:
-    image: solarwatch_12
+    image: solarwatch_01
     ports:
       - 5106:5106
     build:

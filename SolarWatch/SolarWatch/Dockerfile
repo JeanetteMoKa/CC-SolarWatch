@@ -19,6 +19,17 @@ RUN dotnet publish "SolarWatch.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 
 COPY ["SolarWatch/Resources", "/app/Resources"]
 
+# Stage 4: Run EF Core migrations
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS ef-migrations
+WORKDIR /src
+COPY SolarWatch/. .
+
+# Apply migrations
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
+RUN dotnet ef database update --context SolarWatchContext
+RUN dotnet ef database update --context UsersContext
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
