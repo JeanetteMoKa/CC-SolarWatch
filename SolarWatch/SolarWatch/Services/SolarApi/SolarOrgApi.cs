@@ -14,7 +14,7 @@ public class SolarOrgApi : ISolarDataProvider
     public async Task<string> GetCurrent(City city, DateTime date)
     {
         var url =
-            $"https://api.sunrise-sunset.org/json?lat={city.Latitude}&lng={city.Longitude}&formatted=0&date={date:yyyy-MM-dd}&tzid=Europe/Budapest";
+            $"https://api.sunrise-sunset.org/json?lat={city.Latitude}&lng={city.Longitude}&formatted=0&date={date:yyyy-MM-dd}";
 
 
         using var client = new HttpClient();

@@ -27,6 +27,9 @@ export default function UserMain() {
 
     const [sunrise, setSunrise] = useState('');
     const [sunset, setSunset] = useState('');
+    const [timeZone, setTimeZone] = useState({});
+    const [symbol, setSymbol] = useState('+')
+    const timezoneOffsetMin = (new Date()).getTimezoneOffset();
 
 
     useEffect(() => {
@@ -68,8 +71,10 @@ export default function UserMain() {
             const data = await responseData.json();
             setResponse(data);
             console.log('Protected data:', data);
-            setSunset(() => formatTime(data.sunset));
-            setSunrise(() => formatTime(data.sunrise));
+            setSunset(() => formatTime(data.solarData.sunset));
+            setSunrise(() => formatTime(data.solarData.sunrise));
+            setTimeZone(() => data.timeZoneData);
+            setSymbol(() => data.timeZoneData.offsetSeconds >= 0 ? '+' : '-')
         } catch (error) {
             console.error('Error fetching protected data:', error);
         }
@@ -87,6 +92,8 @@ export default function UserMain() {
     useEffect(() => {
         if (response) {
             console.log(sunrise + ' and ' + sunset);
+            console.log(timeZone.name + ' and ' + timeZone.offsetSeconds);
+            console.log(timezoneOffsetMin);
         }
 
     }, [response]);
@@ -147,16 +154,24 @@ export default function UserMain() {
         </div>)
         : ( <>
                 <div className={"dataDisplay"}>
-                    <PlaceName>{cityName}, {countryName}
+                    <PlaceName>{cityName}, {countryName} ({timeZone.name})
                     {stateName ? ` (${stateName})` : ''}
                     <br/>
-                    {new Date(date).toLocaleDateString()}
+                    {new Date(date).toLocaleDateString()} ({symbol}{parseInt(timeZone.offsetSeconds)/60/60*(-1)},00)
                     </PlaceName>
                     <SolarDataGrid>
                         <p>Sunrise: </p>
                         <p>{sunrise}</p>
                         <p>Sunset: </p>
                         <p>{sunset}</p>
+                        { timezoneOffsetMin + parseInt(timeZone.offsetSeconds)/60 !== 0 &&
+                        <>
+                            <p>Local time:</p>
+                            <p>{Math.floor(((Math.floor((sunrise.split(":")[0]*60+sunrise.split(":")[1]*1)/60)+(timezoneOffsetMin/60+parseInt(timeZone.offsetSeconds)/60/60))+24)%24)}:{(sunrise.split(":")[0]*60+sunrise.split(":")[1]*1)%60}</p>
+                            <p>Local time:</p>
+                            <p>{Math.floor(((Math.floor((sunset.split(":")[0]*60+sunset.split(":")[1]*1)/60)+(timezoneOffsetMin/60+parseInt(timeZone.offsetSeconds)/60/60))+24)%24)}:{(sunset.split(":")[0]*60+sunset.split(":")[1]*1)%60}</p>
+                        </>
+                        }
                     </SolarDataGrid>
                 </div>
                 <Button $primary onClick={() => handleReset()}>Reset</Button>

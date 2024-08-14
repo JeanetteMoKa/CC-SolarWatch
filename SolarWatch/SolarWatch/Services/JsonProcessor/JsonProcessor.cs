@@ -3,7 +3,7 @@ using SolarWatch.Model;
 
 namespace SolarWatch.Services.JsonProcessor;
 
-public class JsonProcessor : IJsonProcessor
+public class JsonProcessor(ILogger<JsonProcessor> logger) : IJsonProcessor
 {
     public SolarPhenomena Process(string data, string city)
     {
@@ -39,8 +39,8 @@ public class JsonProcessor : IJsonProcessor
         var result = json.RootElement;
 
         var timeZoneData = new TimeZoneData(
-            name: result.GetProperty("dstInterval").GetProperty("dstName").GetString(),
-            offsetSeconds: result.GetProperty("currentUtcOffset").GetProperty("seconds").GetInt32()
+             result.GetProperty("dstInterval").GetProperty("dstName").GetString(),
+             result.GetProperty("currentUtcOffset").GetProperty("seconds").GetInt32()
         );
 
         return timeZoneData;

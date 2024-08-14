@@ -11,6 +11,7 @@ using SolarWatch.Services.CoordinatesApi;
 using SolarWatch.Services.JsonProcessor;
 using SolarWatch.Services.Repositories;
 using SolarWatch.Services.SolarApi;
+using SolarWatch.Services.TimeZone;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,6 +96,7 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddSingleton<ICityDataProvider, OpenWeatherGeocodingApi>();
 builder.Services.AddSingleton<ISolarDataProvider, SolarOrgApi>();
+builder.Services.AddSingleton<ITimeZoneQuery, TimeZoneQuery>();
 builder.Services.AddSingleton<IJsonProcessor, JsonProcessor>();
 
 builder.Services.AddScoped<ICityRepository, CityRepository>();

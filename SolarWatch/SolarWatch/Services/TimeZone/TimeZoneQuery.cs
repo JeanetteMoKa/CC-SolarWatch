@@ -9,7 +9,7 @@ public class TimeZoneQuery(ILogger<TimeZoneQuery> logger) : ITimeZoneQuery
         
         try
         {
-            var url = $"https://timeapi.io/api/TimeZone/coordinate?latitude={city.Latitude}&longitude={city.Longitude}";
+            var url = $"https://timeapi.io/api/TimeZone/coordinate?latitude={city.Latitude.ToString("F2").Replace(',', '.')}&longitude={city.Longitude.ToString("F2").Replace(',', '.')}";
 
             using var client = new HttpClient();
             logger.LogInformation("Calling timeapi.io with url: {url}", url);
