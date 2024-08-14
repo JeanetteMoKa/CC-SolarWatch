@@ -115,11 +115,54 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// using (var scope = app.Services.CreateScope())
+// {
+//         var authenticationSeeder = scope.ServiceProvider.GetRequiredService<AuthenticationSeeder>();
+//         await authenticationSeeder.AddRoles();
+//         authenticationSeeder.AddAdmin();
+// }
 using (var scope = app.Services.CreateScope())
 {
+    try
+    {
+        // Attempt to seed roles and admin user
         var authenticationSeeder = scope.ServiceProvider.GetRequiredService<AuthenticationSeeder>();
         await authenticationSeeder.AddRoles();
         authenticationSeeder.AddAdmin();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Seeding failed: {ex.Message}. Attempting to apply migrations and retry seeding...");
+
+        try
+        {
+            // Apply migrations to both contexts
+            var dbContexts = new DbContext[]
+            {
+                scope.ServiceProvider.GetRequiredService<SolarWatchContext>(),
+                scope.ServiceProvider.GetRequiredService<UsersContext>()
+            };
+
+            foreach (var context in dbContexts)
+            {
+                context.Database.Migrate();
+            }
+
+            Console.WriteLine("Migrations applied successfully. Retrying seeding...");
+
+            // Retry the seeding process after migrations
+            var authenticationSeeder = scope.ServiceProvider.GetRequiredService<AuthenticationSeeder>();
+            await authenticationSeeder.AddRoles();
+            authenticationSeeder.AddAdmin();
+            Console.WriteLine("Seeding completed successfully after applying migrations.");
+        }
+        catch (Exception migrationEx)
+        {
+            // Log the error if migration and subsequent seeding both fail
+            Console.WriteLine($"Migrations and retry of seeding failed: {migrationEx.Message}");
+            throw; // Re-throw the exception if needed
+        }
+    }
 }
 
 
