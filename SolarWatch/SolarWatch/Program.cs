@@ -117,6 +117,20 @@ using (var
        scope = app.Services
            .CreateScope())
 {
+    var dbContextSolarWatch = scope.ServiceProvider.GetRequiredService<SolarWatchContext>();
+    var dbContextUsers = scope.ServiceProvider.GetRequiredService<UsersContext>();
+    
+    if (!dbContextSolarWatch.Database.GetPendingMigrations().Any())
+    {
+        dbContextSolarWatch.Database.Migrate();
+    }
+
+    if (!dbContextUsers.Database.GetPendingMigrations().Any())
+    {
+        dbContextUsers.Database.Migrate();
+    }
+
+    // Run the seeder after applying migrations
     var authenticationSeeder = scope.ServiceProvider.GetRequiredService<AuthenticationSeeder>();
     await authenticationSeeder.AddRoles();
     authenticationSeeder.AddAdmin();
