@@ -1,4 +1,4 @@
-import './App.css'
+import './CSS/App.css'
 import ParticlesBackground from "./Components/ParticlesBackground.jsx";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Home from "./Components/Home.jsx";

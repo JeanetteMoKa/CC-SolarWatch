@@ -27,10 +27,6 @@ public class SolarDataControllerTests
         _cityRepositoryMock = new Mock<ICityRepository>();
         _solarDataRepositoryMock = new Mock<ISolarDataRepository>();
         _cityDataProviderMock = new Mock<ICityDataProvider>();
-        _configurationMock = new Mock<IConfiguration>();
-
-        _configurationMock.Setup(c => c["Roles:User"]).Returns("User");
-        _configurationMock.Setup(c => c["Roles:Admin"]).Returns("Admin");
 
 
         _dataController =
@@ -39,8 +35,7 @@ public class SolarDataControllerTests
                 _jsonProcessorMock.Object,
                 _solarDataRepositoryMock.Object,
                 _cityRepositoryMock.Object,
-                _cityDataProviderMock.Object,
-                _configurationMock.Object);
+                _cityDataProviderMock.Object);
 
         // Set up the HttpContext for the controller
         var httpContext = new DefaultHttpContext
@@ -60,7 +55,6 @@ public class SolarDataControllerTests
     private Mock<ICityRepository> _cityRepositoryMock;
     private Mock<ISolarDataRepository> _solarDataRepositoryMock;
     private Mock<ICityDataProvider> _cityDataProviderMock;
-    private Mock<IConfiguration> _configurationMock;
     private SolarDataController _dataController;
 
     private ClaimsPrincipal CreateUserPrincipal(string role)
@@ -111,14 +105,6 @@ public class SolarDataControllerTests
 
         var coordinateData = "{\"lat\": 10.0, \"lon\": 20.0}";
         var coordinate = new Coordinate(10.0, 20.0);
-
-        // Mock solar phenomena data
-        var solarData = new SolarData
-        {
-            City = city,
-            Sunrise = DateTime.Now,
-            Sunset = DateTime.Now
-        };
 
         var solarPhenomenaData = "{}";
         var expectedSolarPhenomena = new SolarPhenomena(DateTime.Now, DateTime.Now, cityName);

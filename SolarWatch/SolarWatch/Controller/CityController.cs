@@ -14,19 +14,17 @@ public class CityController : ControllerBase
 {
     private readonly ICityDataProvider _cityDataProvider;
     private readonly ICityRepository _cityRepository;
-    private readonly IConfiguration _configuration;
     private readonly IJsonProcessor _jsonProcessor;
 
     private readonly ILogger<CityController> _logger;
 
     public CityController(ILogger<CityController> logger, ICityDataProvider cityDataProvider,
-        IJsonProcessor jsonProcessor, ICityRepository cityRepository, IConfiguration configuration)
+        IJsonProcessor jsonProcessor, ICityRepository cityRepository)
     {
         _logger = logger;
         _cityDataProvider = cityDataProvider;
         _jsonProcessor = jsonProcessor;
         _cityRepository = cityRepository;
-        _configuration = configuration;
     }
 
 

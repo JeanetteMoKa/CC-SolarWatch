@@ -15,7 +15,6 @@ public class SolarDataController : ControllerBase
 {
     private readonly ICityDataProvider _cityDataProvider;
     private readonly ICityRepository _cityRepository;
-    private readonly IConfiguration _configuration;
     private readonly IJsonProcessor _jsonProcessor;
     private readonly ILogger<SolarDataController> _logger;
     private readonly ISolarDataProvider _solarDataProvider;
@@ -24,7 +23,7 @@ public class SolarDataController : ControllerBase
     public SolarDataController(ILogger<SolarDataController> logger,
         ISolarDataProvider solarDataProvider, IJsonProcessor jsonProcessor,
         ISolarDataRepository solarDataRepository, ICityRepository cityRepository,
-        ICityDataProvider cityDataProvider, IConfiguration configuration)
+        ICityDataProvider cityDataProvider)
     {
         _logger = logger;
         _solarDataProvider = solarDataProvider;
@@ -32,12 +31,10 @@ public class SolarDataController : ControllerBase
         _solarDataRepository = solarDataRepository;
         _cityRepository = cityRepository;
         _cityDataProvider = cityDataProvider;
-        _configuration = configuration;
     }
 
     [HttpGet("{cityName}/{date:datetime}")]
     [Authorize(Policy = "RequiredUserOrAdminRole")]
-    //[Authorize(Roles = "User, Admin")]
     public async Task<ActionResult<SolarData>> GetCurrent(
         [FromRoute] string cityName,
         [FromRoute] DateTime date, 

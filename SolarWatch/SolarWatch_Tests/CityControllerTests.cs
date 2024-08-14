@@ -24,18 +24,14 @@ public class CityControllerTests
         _cityDataProviderMock = new Mock<ICityDataProvider>();
         _jsonProcessorMock = new Mock<IJsonProcessor>();
         _cityRepositoryMock = new Mock<ICityRepository>();
-        _configurationMock = new Mock<IConfiguration>();
 
-        _configurationMock.Setup(c => c["Roles:User"]).Returns("User");
-        _configurationMock.Setup(c => c["Roles:Admin"]).Returns("Admin");
 
         _controller =
             new CityController(
                 _loggerMock.Object,
                 _cityDataProviderMock.Object,
                 _jsonProcessorMock.Object,
-                _cityRepositoryMock.Object,
-                _configurationMock.Object
+                _cityRepositoryMock.Object
             );
 
         // Set up the HttpContext for the controller
@@ -54,7 +50,6 @@ public class CityControllerTests
     private Mock<ICityDataProvider> _cityDataProviderMock;
     private Mock<IJsonProcessor> _jsonProcessorMock;
     private Mock<ICityRepository> _cityRepositoryMock;
-    private Mock<IConfiguration> _configurationMock;
     private CityController _controller;
 
     private ClaimsPrincipal CreateUserPrincipal(string role)
