@@ -8,10 +8,12 @@ using Moq;
 using SolarWatch.Controller;
 using SolarWatch.Model;
 using SolarWatch.Model.DbModel;
+using SolarWatch.Model.DTO;
 using SolarWatch.Services.CoordinatesApi;
 using SolarWatch.Services.JsonProcessor;
 using SolarWatch.Services.Repositories;
 using SolarWatch.Services.SolarApi;
+using SolarWatch.Services.TimeZone;
 
 namespace SolarWatch_Tests;
 
@@ -27,6 +29,7 @@ public class SolarDataControllerTests
         _cityRepositoryMock = new Mock<ICityRepository>();
         _solarDataRepositoryMock = new Mock<ISolarDataRepository>();
         _cityDataProviderMock = new Mock<ICityDataProvider>();
+        _timeZoneQueryMock = new Mock<ITimeZoneQuery>();
 
 
         _dataController =
@@ -35,7 +38,8 @@ public class SolarDataControllerTests
                 _jsonProcessorMock.Object,
                 _solarDataRepositoryMock.Object,
                 _cityRepositoryMock.Object,
-                _cityDataProviderMock.Object);
+                _cityDataProviderMock.Object,
+                _timeZoneQueryMock.Object);
 
         // Set up the HttpContext for the controller
         var httpContext = new DefaultHttpContext
@@ -56,6 +60,7 @@ public class SolarDataControllerTests
     private Mock<ISolarDataRepository> _solarDataRepositoryMock;
     private Mock<ICityDataProvider> _cityDataProviderMock;
     private SolarDataController _dataController;
+    private Mock<ITimeZoneQuery> _timeZoneQueryMock;
 
     private ClaimsPrincipal CreateUserPrincipal(string role)
     {
@@ -125,6 +130,7 @@ public class SolarDataControllerTests
         _jsonProcessorMock.Setup(x => x.Process(solarPhenomenaData, cityName))
             .Returns(expectedSolarPhenomena);
         _solarDataRepositoryMock.Setup(x => x.Add(It.IsAny<SolarData>()));
+        _timeZoneQueryMock.Setup(x => x.GetTimeZone(It.IsAny<City>()));
 
 
         _dataController.ControllerContext.HttpContext.User = CreateUserPrincipal("Admin");
@@ -136,15 +142,15 @@ public class SolarDataControllerTests
         Assert.IsInstanceOf<OkObjectResult>(result.Result);
         var okResult = result.Result as OkObjectResult;
         Assert.NotNull(okResult);
-        var actualSolarData = okResult.Value as SolarData;
-        Assert.NotNull(actualSolarData);
-        Assert.That(actualSolarData.Sunrise, Is.EqualTo(expectedSolarPhenomena.SunRise));
-        Assert.That(actualSolarData.Sunset, Is.EqualTo(expectedSolarPhenomena.SunSet));
-        Assert.That(actualSolarData.City.Name, Is.EqualTo(city.Name));
-        Assert.That(actualSolarData.City.Country, Is.EqualTo(city.Country));
-        Assert.That(actualSolarData.City.Latitude, Is.EqualTo(city.Latitude));
-        Assert.That(actualSolarData.City.Longitude, Is.EqualTo(city.Longitude));
-        Assert.That(actualSolarData.City.State, Is.EqualTo(city.State));
+        var resultValue = okResult.Value as SolarDataWTimeZoneDto;
+        Assert.NotNull(resultValue);
+        Assert.That(resultValue.SolarData.Sunrise, Is.EqualTo(expectedSolarPhenomena.SunRise));
+        Assert.That(resultValue.SolarData.Sunset, Is.EqualTo(expectedSolarPhenomena.SunSet));
+        Assert.That(resultValue.SolarData.City.Name, Is.EqualTo(city.Name));
+        Assert.That(resultValue.SolarData.City.Country, Is.EqualTo(city.Country));
+        Assert.That(resultValue.SolarData.City.Latitude, Is.EqualTo(city.Latitude));
+        Assert.That(resultValue.SolarData.City.Longitude, Is.EqualTo(city.Longitude));
+        Assert.That(resultValue.SolarData.City.State, Is.EqualTo(city.State));
 
         // Verify the Add methods were called
         _cityRepositoryMock.Verify(x => x.Add(It.IsAny<City>()), Times.Once);

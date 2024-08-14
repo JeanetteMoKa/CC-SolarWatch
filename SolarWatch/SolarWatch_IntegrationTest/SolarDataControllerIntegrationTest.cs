@@ -3,7 +3,9 @@ using System.Net.Http.Json;
 using System.Text;
 using Newtonsoft.Json;
 using SolarWatch.Contracts;
+using SolarWatch.Model;
 using SolarWatch.Model.DbModel;
+using SolarWatch.Model.DTO;
 using Xunit.Abstractions;
 
 namespace SolarWatch_IntegrationTest;
@@ -44,28 +46,32 @@ public class MyControllerIntegrationTest
         var response = await _client.GetAsync( "api/SolarData/Budapest/2024-07-29?countryName=Hungary");
         response.EnsureSuccessStatusCode();
         
-        var data = await response.Content.ReadFromJsonAsync<SolarData>();
+        var data = await response.Content.ReadFromJsonAsync<SolarDataWTimeZoneDto>();
         
-        var expected = new SolarData
+        var expected = new SolarDataWTimeZoneDto()
         {
-            City = new City
+           SolarData = new SolarData()
             {
-                Name = "Budapest",
-                Country = "Hungary",
-                Latitude = 47.4979937,
-                Longitude = 19.0403594,
+                City = new City
+                {
+                    Name = "Budapest",
+                    Country = "Hungary",
+                    Latitude = 47.4979937,
+                    Longitude = 19.0403594,
+                },
+                Sunrise = new DateTime(2024, 7, 29, 5, 18, 43),
+                Sunset = new DateTime(2024, 7, 29, 20, 22, 15)
             },
-            Sunrise = new DateTime(2024, 7, 29, 5, 18, 43),
-            Sunset = new DateTime(2024, 7, 29, 20, 22, 15)
+            TimeZoneData = new TimeZoneData("CEST", 7200)
         };
         //Assert
-        Assert.Equal(expected.City.Name, data.City.Name);
-        Assert.Equal(expected.City.Country, data.City.Country);
-        Assert.Equal(expected.City.State, data.City.State);
-        Assert.Equal(expected.City.Latitude, data.City.Latitude);
-        Assert.Equal(expected.City.Longitude, data.City.Longitude);
-        Assert.Equal(expected.Sunrise, data.Sunrise);
-        Assert.Equal(expected.Sunset, data.Sunset);
+        Assert.Equal(expected.SolarData.City.Name, data.SolarData.City.Name);
+        Assert.Equal(expected.SolarData.City.Country, data.SolarData.City.Country);
+        Assert.Equal(expected.SolarData.City.State, data.SolarData.City.State);
+        Assert.Equal(expected.SolarData.City.Latitude, data.SolarData.City.Latitude);
+        Assert.Equal(expected.SolarData.City.Longitude, data.SolarData.City.Longitude);
+        Assert.Equal(expected.SolarData.Sunrise, data.SolarData.Sunrise);
+        Assert.Equal(expected.SolarData.Sunset, data.SolarData.Sunset);
     }
     
     [Fact]
