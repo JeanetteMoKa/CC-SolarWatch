@@ -119,29 +119,41 @@ using (var
 {
     var dbContextSolarWatch = scope.ServiceProvider.GetRequiredService<SolarWatchContext>();
     var dbContextUsers = scope.ServiceProvider.GetRequiredService<UsersContext>();
-    
-    if (dbContextSolarWatch.Database.CanConnect())
-    {
-        if (!dbContextSolarWatch.Database.GetPendingMigrations().Any())
-        {
-            dbContextSolarWatch.Database.Migrate();
-        }
-    }
-    else
-    {
-        dbContextSolarWatch.Database.EnsureCreated();
-    }
 
-    if (dbContextUsers.Database.CanConnect())
+    if (!builder.Environment.IsEnvironment("Testing"))
     {
-        if (!dbContextUsers.Database.GetPendingMigrations().Any())
+        if (dbContextSolarWatch.Database.CanConnect())
         {
-            dbContextUsers.Database.Migrate();
+            if (!dbContextSolarWatch.Database.GetPendingMigrations().Any())
+            {
+                dbContextSolarWatch.Database.Migrate();
+            }
         }
-    }
-    else
-    {
-        dbContextUsers.Database.EnsureCreated();
+        else
+        {
+            dbContextSolarWatch.Database.EnsureCreated();
+        }
+
+        var loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+        var logger = loggerFactory.CreateLogger<Program>();
+        try
+        {
+            if (dbContextUsers.Database.CanConnect())
+            {
+                if (!dbContextUsers.Database.GetPendingMigrations().Any())
+                {
+                    dbContextUsers.Database.Migrate();
+                }
+            }
+            else
+            {
+                dbContextUsers.Database.EnsureCreated();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while initializing UsersContext.");
+        }
     }
 
     var authenticationSeeder = scope.ServiceProvider.GetRequiredService<AuthenticationSeeder>();
