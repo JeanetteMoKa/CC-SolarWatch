@@ -13,11 +13,8 @@ using SolarWatch.Services.SolarApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
@@ -55,21 +52,6 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        // options.Events.OnForbidden =  context =>
-        // {
-        //     Console.WriteLine(context.Result.Failure?.Message);
-        //     return Task.CompletedTask;
-        // };
-        // options.Events.OnAuthenticationFailed = context =>
-        // {
-        //     Console.WriteLine(context.Exception.Message);
-        //     return Task.CompletedTask;
-        // };
-            // options.Events.OnRedirectToLogi = c =>
-            // {
-            //     c.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            //     return Task.FromResult<object>(null);
-            // };
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ClockSkew = TimeSpan.Zero,
@@ -79,8 +61,7 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings["ValidIssuer"],
             ValidAudience = jwtSettings["ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:IssuerSigningKey"])
+            IssuerSigningKey = jwtSettings["IssuerSigningKey"])
             )
         };
     });
@@ -96,7 +77,7 @@ builder.Services
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
     })
-    .AddRoles<IdentityRole>() //Enable Identity roles 
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<UsersContext>();
 
 var rolesSection = builder.Configuration.GetSection("Roles");
@@ -119,13 +100,11 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<AuthenticationSeeder>();
 
 
-// Access the configuration directly
 var frontendUrl = builder.Configuration.GetValue<string>("frontend_url");
 
-// Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder => { builder.WithOrigins(frontendUrl).AllowAnyMethod().AllowAnyHeader(); }); //AllowCredentials()
+    options.AddDefaultPolicy(builder => { builder.WithOrigins(frontendUrl).AllowAnyMethod().AllowAnyHeader(); });
 });
 
 var app = builder.Build();
@@ -139,7 +118,6 @@ using (var
     authenticationSeeder.AddAdmin();
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
