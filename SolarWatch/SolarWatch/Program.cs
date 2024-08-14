@@ -1,4 +1,5 @@
 using System.Text;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,8 @@ using SolarWatch.Services.Repositories;
 using SolarWatch.Services.SolarApi;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
 
 builder.Services.AddControllers();
 
@@ -61,7 +64,8 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings["ValidIssuer"],
             ValidAudience = jwtSettings["ValidAudience"],
-            IssuerSigningKey = jwtSettings["IssuerSigningKey"])
+            IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(jwtSettings["IssuerSigningKey"])
             )
         };
     });

@@ -7,6 +7,7 @@ namespace SolarWatch.Services.CoordinatesApi;
 public class OpenWeatherGeocodingApi : ICityDataProvider
 {
     private static readonly string WorkDir = AppDomain.CurrentDomain.BaseDirectory;
+    
 
     private readonly ILogger<OpenWeatherGeocodingApi> _logger;
 
@@ -17,7 +18,7 @@ public class OpenWeatherGeocodingApi : ICityDataProvider
 
     public async Task<string> GetCoordinates(string city, string country, string? state)
     {
-        var apiKey = "c4ec0f58e2a54b3432bae1c9deaf44a3";
+        var apiKey = Environment.GetEnvironmentVariable("OPEN_WEATHER_APIKEY");
 
         var filePathCountries = Path.Combine(WorkDir, "Resources", "CountryCodesISO3166.csv");
 
