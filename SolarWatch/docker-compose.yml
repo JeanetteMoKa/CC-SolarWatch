@@ -6,6 +6,8 @@
     build:
       context: .
       dockerfile: SolarWatch/Dockerfile
+    env_file:
+      - SolarWatch/.env
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - frontend_url=http://localhost

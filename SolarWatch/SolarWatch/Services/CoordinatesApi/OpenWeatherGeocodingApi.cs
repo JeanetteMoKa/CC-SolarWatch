@@ -8,10 +8,9 @@ public class OpenWeatherGeocodingApi : ICityDataProvider
 {
     private static readonly string WorkDir = AppDomain.CurrentDomain.BaseDirectory;
     
-
     private readonly ILogger<OpenWeatherGeocodingApi> _logger;
 
-    public OpenWeatherGeocodingApi(ILogger<OpenWeatherGeocodingApi> logger)
+    public OpenWeatherGeocodingApi(ILogger<OpenWeatherGeocodingApi> logger, IConfiguration configuration)
     {
         _logger = logger;
     }
@@ -19,6 +18,7 @@ public class OpenWeatherGeocodingApi : ICityDataProvider
     public async Task<string> GetCoordinates(string city, string country, string? state)
     {
         var apiKey = Environment.GetEnvironmentVariable("OPEN_WEATHER_APIKEY");
+        _logger.LogInformation(apiKey);
 
         var filePathCountries = Path.Combine(WorkDir, "Resources", "CountryCodesISO3166.csv");
 

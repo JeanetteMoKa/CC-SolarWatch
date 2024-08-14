@@ -9,7 +9,7 @@ export default defineConfig({
         target: 'http://localhost:5106',
         changeOrigin: true,
       },
-    },
+    }
   },
   plugins: [react()],
 })

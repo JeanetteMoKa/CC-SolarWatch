@@ -10,6 +10,17 @@ COPY Frontend/. .
 
 RUN npm run build
 
-EXPOSE 5173
+# Stage 2: Serve the static files using nginx
+FROM nginx:alpine
 
-CMD [ "npm", "run", "preview", "--", "--host", "0.0.0.0" ]
+# Copy custom nginx configuration
+COPY Frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy build files from the previous stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Expose port 80 to the outside world
+EXPOSE 80
+
+# Run nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]
