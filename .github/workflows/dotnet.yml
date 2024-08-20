@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-backend:
 
     runs-on: ubuntu-latest
 
@@ -32,4 +32,68 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
       working-directory: SolarWatch/
+  
+  build-frontend:
+    runs-on: ubuntu-latest
+    needs: build-backend
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.x'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: SolarWatch/Frontend  
+
+      - name: Run npm CI
+        run: npm ci
+        working-directory: SolarWatch/Frontend 
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: SolarWatch/Frontend 
+    
+  push_to_DockerHub:
+      name: Push Images to DockerHub
+      # The type of runner that the job will run on
+      runs-on: ubuntu-latest
+      # build Docker image and push to docker hub
+      # only if the app build and test successfully
+      needs: [build-frontend]
+
+      steps:
+        - name: checkout repo
+          uses: actions/checkout@v2
+
+        - name: Set up QEMU
+          uses: docker/setup-qemu-action@v1
+
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v1
+
+        - name: Login to DockerHub
+          uses: docker/login-action@v1
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+        - name: Build and push backend
+          uses: docker/build-push-action@v2
+          with:
+            context: solarwatch/
+            file: SolarWatch/SolarWatch/Dockerfile
+            push: true
+            tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend-solarwatch:latest
+        
+        - name: Build and push frontend
+          uses: docker/build-push-action@v2
+          with:
+            context: savings-sage/
+            file: SolarWatch/Frontend/Frontend.dockerfile
+            push: true
+            tags: ${{ secrets.DOCKERHUB_USERNAME }}/frontend-solarwatch:latest
