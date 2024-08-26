@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SolarWatch.Model.DbModel;
@@ -47,16 +48,18 @@ public class SolarDataController : ControllerBase
     {
         try
         {
-            var city = await _cityRepository.GetByName(cityName, countryName, stateName);
+            var decodedCityName = cityName.Replace("+", " ");
+            var decodedCountryName = countryName.Replace("+", " ");
+            var city = await _cityRepository.GetByName(decodedCityName, decodedCountryName, stateName);
 
             if (city == null)
             {
-                    var coordinateRaw = await _cityDataProvider.GetCoordinates(cityName, countryName, stateName);
+                    var coordinateRaw = await _cityDataProvider.GetCoordinates(decodedCityName, decodedCountryName, stateName);
                     var coordinate = _jsonProcessor.ProcessCoordinates(coordinateRaw);
                     city = new City
                     {
-                        Name = cityName,
-                        Country = countryName,
+                        Name = decodedCityName,
+                        Country = decodedCountryName,
                         Latitude = coordinate.Lat,
                         Longitude = coordinate.Lon,
                         State = stateName ?? string.Empty
@@ -73,7 +76,7 @@ public class SolarDataController : ControllerBase
             if (solarData == null)
             {
                     var solarDataRaw = await _solarDataProvider.GetCurrent(city, date);
-                    var solarPhenomena = _jsonProcessor.Process(solarDataRaw, cityName);
+                    var solarPhenomena = _jsonProcessor.Process(solarDataRaw, decodedCityName);
 
                     solarData = new SolarData
                     {

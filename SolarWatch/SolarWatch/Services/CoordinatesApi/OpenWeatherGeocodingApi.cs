@@ -292,7 +292,10 @@ public class OpenWeatherGeocodingApi : ICityDataProvider
             new CountryCodes { Id = 243, Name = "Zimbabwe", Alpha2 = "ZW" },
             new CountryCodes { Id = 244, Name = "Åland Islands", Alpha2 = "AX" },
             new CountryCodes { Id = 245, Name = "North Korea", Alpha2 = "KP" },
-            new CountryCodes { Id = 246, Name = "South Korea", Alpha2 = "KR" }
+            new CountryCodes { Id = 246, Name = "South Korea", Alpha2 = "KR" },
+            new CountryCodes { Id = 247, Name = "United Kingdom", Alpha2 = "GB" },
+            new CountryCodes { Id = 248, Name = "Great Britain", Alpha2 = "GB" },
+            new CountryCodes { Id = 249, Name = "England", Alpha2 = "GB" },
         };
         return countryCodes.FirstOrDefault(x => x.Name == country);
     }
