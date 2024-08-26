@@ -1,5 +1,3 @@
-using CsvHelper.Configuration.Attributes;
-
 namespace SolarWatch.Model;
 
 public class StateCodes

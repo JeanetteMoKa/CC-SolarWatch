@@ -1,4 +1,3 @@
-using CsvHelper.Configuration.Attributes;
 
 namespace SolarWatch.Model;
 

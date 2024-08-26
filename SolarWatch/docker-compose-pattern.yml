@@ -11,7 +11,7 @@
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - frontend_url=http://localhost
-      - CONNECTIONSTRINGS__DEFAULT=Server=db,1433;Database=SolarWatch;User Id=sa;Password=Ant34teR;Encrypt=False;
+      - CONNECTIONSTRINGS__DEFAULT=Server=db,1433;Database=SolarWatch;User Id=sa;Password=<your sa password>;Encrypt=False;
     depends_on:
       - db
   
@@ -21,7 +21,7 @@
       - 1433:1433
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "Ant34teR"
+      MSSQL_SA_PASSWORD: <your sa password>
   
   solarwatch-frontend:
     image: solarwatchfront01
