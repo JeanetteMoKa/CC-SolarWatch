@@ -33,7 +33,9 @@ export default function Login(){
             });
 
             if (!response.ok) {
-                throw new Error('Login failed');
+                const errorData = await response.json();
+                alert(errorData[Object.keys(errorData)]);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();

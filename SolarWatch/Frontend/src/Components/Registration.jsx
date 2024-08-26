@@ -25,7 +25,6 @@ export default function Registration(){
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(JSON.stringify(formData))
         try {
             const response = await fetch('/api/Auth/Register', {
                 method: 'POST',
@@ -36,6 +35,8 @@ export default function Registration(){
             });
 
             if (!response.ok) {
+                const errorData = await response.json();
+                alert(errorData[Object.keys(errorData)]);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
@@ -80,7 +81,7 @@ export default function Registration(){
                     <Input
                         type="password"
                         name="password"
-                        value={formData.password}
+                        value={formData.password}                        
                         onChange={handleChange}
                         required
                     /></label>

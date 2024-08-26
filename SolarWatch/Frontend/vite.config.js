@@ -10,12 +10,7 @@ const backendUrl = isDevelopment
     : process.env.DEPLOYMENT_BACKEND_URL;
 
 const defaultConfig = {
-  plugins: [react()],
-    resolve: {
-      alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url))
-      }
-    }
+  plugins: [react()]
 }
 
 // https://vitejs.dev/config/
