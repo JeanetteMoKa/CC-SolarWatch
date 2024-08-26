@@ -8,15 +8,29 @@ const backendUrl = isDevelopment
     ? process.env.DEVELOPMENT_BACKEND_URL
     : process.env.DEPLOYMENT_BACKEND_URL;
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  server: {
-    proxy: {
-      '/api': {
-        target: backendUrl,
-        changeOrigin: true,
-      },
-    }
-  },
+const defaultConfig = {
   plugins: [react()],
+}
+
+// https://vitejs.dev/config/
+export default defineConfig(({ command, mode }) => {
+
+  if (command === 'serve') {
+    const isDev = mode === 'development'
+
+    return {
+      ...defaultConfig,
+      server: {
+        proxy: {
+          '/api': {
+            target: backendUrl,
+            changeOrigin: isDev
+          }
+        }
+      }
+    }
+  } else {
+    return defaultConfig
+  }
+  
 })
