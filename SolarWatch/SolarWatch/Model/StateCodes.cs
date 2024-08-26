@@ -4,7 +4,7 @@ namespace SolarWatch.Model;
 
 public class StateCodes
 {
-    [Name("state-name")] public string StateName { get; set; }
-
-    [Name("state-code")] public string StateCode { get; set; }
+    public int Id { get; set; }
+    public string StateName { get; set; }
+    public string StateCode { get; set; }
 }

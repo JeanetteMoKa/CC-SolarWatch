@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5106',
+        target: 'https://solarwatchapi-frggbueydffzfren.polandcentral-01.azurewebsites.net',
         changeOrigin: true,
       },
     }

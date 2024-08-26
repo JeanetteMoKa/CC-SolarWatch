@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SolarWatch.Model;
 using SolarWatch.Model.DbModel;
 
 namespace SolarWatch.Context;

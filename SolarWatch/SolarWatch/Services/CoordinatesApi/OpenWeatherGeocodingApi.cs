@@ -1,57 +1,30 @@
-using System.Globalization;
-using CsvHelper;
+using SolarWatch.Context;
 using SolarWatch.Model;
 
 namespace SolarWatch.Services.CoordinatesApi;
 
 public class OpenWeatherGeocodingApi : ICityDataProvider
 {
-    private static readonly string WorkDir = AppDomain.CurrentDomain.BaseDirectory;
-    
+    private readonly IConfiguration _configuration;
+
     private readonly ILogger<OpenWeatherGeocodingApi> _logger;
 
-    public OpenWeatherGeocodingApi(ILogger<OpenWeatherGeocodingApi> logger)
+    public OpenWeatherGeocodingApi(ILogger<OpenWeatherGeocodingApi> logger, IConfiguration configuration)
     {
         _logger = logger;
+        _configuration = configuration;
     }
 
     public async Task<string> GetCoordinates(string city, string country, string? state)
     {
-        var apiKey = Environment.GetEnvironmentVariable("OPEN_WEATHER_APIKEY");
-        _logger.LogInformation(apiKey);
-
-        var filePathCountries = Path.Combine(WorkDir, "Resources", "CountryCodesISO3166.csv");
-
-        if (!File.Exists(filePathCountries))
-        {
-            _logger.LogError("File not found: {filePathCountries}", filePathCountries);
-            throw new FileNotFoundException("Country codes file not found.", filePathCountries);
-        }
-
-        var filePathStates = Path.Combine(WorkDir, "Resources", "StateCodes.csv");
-
-        if (!File.Exists(filePathStates))
-        {
-            _logger.LogError("File not found: {filePathStates}", filePathStates);
-            throw new FileNotFoundException("State codes file not found.", filePathStates);
-        }
-
-        using var readerCountries = new StreamReader(filePathCountries);
-        using var csvReaderCountries = new CsvReader(readerCountries, CultureInfo.InvariantCulture);
-
-        var countryCodesEnumerable = csvReaderCountries.GetRecords<CountryCodes>();
-
-        using var readerStates = new StreamReader(filePathStates);
-        using var csvReaderStates = new CsvReader(readerStates, CultureInfo.InvariantCulture);
-
-        var stateCodesEnumerable = csvReaderStates.GetRecords<StateCodes>();
+        var apiKey = _configuration.GetSection("Secret")["OPEN_WEATHER_APIKEY"];
 
         try
         {
-            var cc = countryCodesEnumerable.FirstOrDefault(x => x.Name.ToLower().Contains(country.ToLower()));
             var sc = state != null
-                ? $"{stateCodesEnumerable.FirstOrDefault(x => x.StateName.ToLower().Contains(state.ToLower())).StateCode},"
-                : "";
+                ? GetStateCode(state) : "";
+            var cc = GetCountryCode(country);
+
 
             var url = country.ToLower() == "usa" || country.ToLower() == "united states of america"
                 ? $"http://api.openweathermap.org/geo/1.0/direct?q={city},{sc}{cc.Alpha2}&appid={apiKey}"
@@ -68,5 +41,324 @@ public class OpenWeatherGeocodingApi : ICityDataProvider
             _logger.LogError("Country code not found for country: {country}", country);
             throw new Exception($"Country code not found for country: {country}");
         }
+    }
+
+    private CountryCodes GetCountryCode(string country)
+    {
+        List<CountryCodes> countryCodes = new List<CountryCodes>()
+        {
+            new CountryCodes { Id = 1, Name = "Afghanistan", Alpha2 = "AF" },
+            new CountryCodes { Id = 2, Name = "Åland Islands", Alpha2 = "AX" },
+            new CountryCodes { Id = 3, Name = "Albania", Alpha2 = "AL" },
+            new CountryCodes { Id = 4, Name = "Algeria", Alpha2 = "DZ" },
+            new CountryCodes { Id = 5, Name = "American Samoa", Alpha2 = "AS" },
+            new CountryCodes { Id = 6, Name = "Andorra", Alpha2 = "AD" },
+            new CountryCodes { Id = 7, Name = "Angola", Alpha2 = "AO" },
+            new CountryCodes { Id = 8, Name = "Anguilla", Alpha2 = "AI" },
+            new CountryCodes { Id = 9, Name = "Antarctica", Alpha2 = "AQ" },
+            new CountryCodes { Id = 10, Name = "Antigua and Barbuda", Alpha2 = "AG" },
+            new CountryCodes { Id = 11, Name = "Argentina", Alpha2 = "AR" },
+            new CountryCodes { Id = 12, Name = "Armenia", Alpha2 = "AM" },
+            new CountryCodes { Id = 13, Name = "Aruba", Alpha2 = "AW" },
+            new CountryCodes { Id = 14, Name = "Australia", Alpha2 = "AU" },
+            new CountryCodes { Id = 15, Name = "Austria", Alpha2 = "AT" },
+            new CountryCodes { Id = 16, Name = "Azerbaijan", Alpha2 = "AZ" },
+            new CountryCodes { Id = 17, Name = "Bahamas", Alpha2 = "BS" },
+            new CountryCodes { Id = 18, Name = "Bahrain", Alpha2 = "BH" },
+            new CountryCodes { Id = 19, Name = "Bangladesh", Alpha2 = "BD" },
+            new CountryCodes { Id = 20, Name = "Barbados", Alpha2 = "BB" },
+            new CountryCodes { Id = 21, Name = "Belarus", Alpha2 = "BY" },
+            new CountryCodes { Id = 22, Name = "Belgium", Alpha2 = "BE" },
+            new CountryCodes { Id = 23, Name = "Belize", Alpha2 = "BZ" },
+            new CountryCodes { Id = 24, Name = "Benin", Alpha2 = "BJ" },
+            new CountryCodes { Id = 25, Name = "Bermuda", Alpha2 = "BM" },
+            new CountryCodes { Id = 26, Name = "Bhutan", Alpha2 = "BT" },
+            new CountryCodes { Id = 27, Name = "Bolivia (Plurinational State of)", Alpha2 = "BO" },
+            new CountryCodes { Id = 28, Name = "Bonaire, Sint Eustatius and Saba", Alpha2 = "BQ" },
+            new CountryCodes { Id = 29, Name = "Bosnia and Herzegovina", Alpha2 = "BA" },
+            new CountryCodes { Id = 30, Name = "Botswana", Alpha2 = "BW" },
+            new CountryCodes { Id = 31, Name = "Bouvet Island", Alpha2 = "BV" },
+            new CountryCodes { Id = 32, Name = "Brazil", Alpha2 = "BR" },
+            new CountryCodes { Id = 33, Name = "British Indian Ocean Territory", Alpha2 = "IO" },
+            new CountryCodes { Id = 34, Name = "Brunei Darussalam", Alpha2 = "BN" },
+            new CountryCodes { Id = 35, Name = "Bulgaria", Alpha2 = "BG" },
+            new CountryCodes { Id = 36, Name = "Burkina Faso", Alpha2 = "BF" },
+            new CountryCodes { Id = 37, Name = "Burundi", Alpha2 = "BI" },
+            new CountryCodes { Id = 38, Name = "Cabo Verde", Alpha2 = "CV" },
+            new CountryCodes { Id = 39, Name = "Cambodia", Alpha2 = "KH" },
+            new CountryCodes { Id = 40, Name = "Cameroon", Alpha2 = "CM" },
+            new CountryCodes { Id = 41, Name = "Canada", Alpha2 = "CA" },
+            new CountryCodes { Id = 42, Name = "Cayman Islands", Alpha2 = "KY" },
+            new CountryCodes { Id = 43, Name = "Central African Republic", Alpha2 = "CF" },
+            new CountryCodes { Id = 44, Name = "Chad", Alpha2 = "TD" },
+            new CountryCodes { Id = 45, Name = "Chile", Alpha2 = "CL" },
+            new CountryCodes { Id = 46, Name = "China", Alpha2 = "CN" },
+            new CountryCodes { Id = 47, Name = "Christmas Island", Alpha2 = "CX" },
+            new CountryCodes { Id = 48, Name = "Cocos (Keeling) Islands", Alpha2 = "CC" },
+            new CountryCodes { Id = 49, Name = "Colombia", Alpha2 = "CO" },
+            new CountryCodes { Id = 50, Name = "Comoros", Alpha2 = "KM" },
+            new CountryCodes { Id = 51, Name = "Congo", Alpha2 = "CG" },
+            new CountryCodes { Id = 52, Name = "Congo (Democratic Republic of the)", Alpha2 = "CD" },
+            new CountryCodes { Id = 53, Name = "Cook Islands", Alpha2 = "CK" },
+            new CountryCodes { Id = 54, Name = "Costa Rica", Alpha2 = "CR" },
+            new CountryCodes { Id = 55, Name = "Croatia", Alpha2 = "HR" },
+            new CountryCodes { Id = 56, Name = "Cuba", Alpha2 = "CU" },
+            new CountryCodes { Id = 57, Name = "Curaçao", Alpha2 = "CW" },
+            new CountryCodes { Id = 58, Name = "Cyprus", Alpha2 = "CY" },
+            new CountryCodes { Id = 59, Name = "Czech Republic", Alpha2 = "CZ" },
+            new CountryCodes { Id = 60, Name = "Denmark", Alpha2 = "DK" },
+            new CountryCodes { Id = 61, Name = "Djibouti", Alpha2 = "DJ" },
+            new CountryCodes { Id = 62, Name = "Dominica", Alpha2 = "DM" },
+            new CountryCodes { Id = 63, Name = "Dominican Republic", Alpha2 = "DO" },
+            new CountryCodes { Id = 64, Name = "Ecuador", Alpha2 = "EC" },
+            new CountryCodes { Id = 65, Name = "Egypt", Alpha2 = "EG" },
+            new CountryCodes { Id = 66, Name = "El Salvador", Alpha2 = "SV" },
+            new CountryCodes { Id = 67, Name = "Equatorial Guinea", Alpha2 = "GQ" },
+            new CountryCodes { Id = 68, Name = "Eritrea", Alpha2 = "ER" },
+            new CountryCodes { Id = 69, Name = "Estonia", Alpha2 = "EE" },
+            new CountryCodes { Id = 70, Name = "Ethiopia", Alpha2 = "ET" },
+            new CountryCodes { Id = 71, Name = "Falkland Islands (Malvinas)", Alpha2 = "FK" },
+            new CountryCodes { Id = 72, Name = "Faroe Islands", Alpha2 = "FO" },
+            new CountryCodes { Id = 73, Name = "Fiji", Alpha2 = "FJ" },
+            new CountryCodes { Id = 74, Name = "Finland", Alpha2 = "FI" },
+            new CountryCodes { Id = 75, Name = "France", Alpha2 = "FR" },
+            new CountryCodes { Id = 76, Name = "French Guiana", Alpha2 = "GF" },
+            new CountryCodes { Id = 77, Name = "French Polynesia", Alpha2 = "PF" },
+            new CountryCodes { Id = 78, Name = "French Southern Territories", Alpha2 = "TF" },
+            new CountryCodes { Id = 79, Name = "Gabon", Alpha2 = "GA" },
+            new CountryCodes { Id = 80, Name = "Gambia", Alpha2 = "GM" },
+            new CountryCodes { Id = 81, Name = "Georgia", Alpha2 = "GE" },
+            new CountryCodes { Id = 82, Name = "Germany", Alpha2 = "DE" },
+            new CountryCodes { Id = 83, Name = "Ghana", Alpha2 = "GH" },
+            new CountryCodes { Id = 84, Name = "Gibraltar", Alpha2 = "GI" },
+            new CountryCodes { Id = 85, Name = "Greece", Alpha2 = "GR" },
+            new CountryCodes { Id = 86, Name = "Greenland", Alpha2 = "GL" },
+            new CountryCodes { Id = 87, Name = "Grenada", Alpha2 = "GD" },
+            new CountryCodes { Id = 88, Name = "Guadeloupe", Alpha2 = "GP" },
+            new CountryCodes { Id = 89, Name = "Guam", Alpha2 = "GU" },
+            new CountryCodes { Id = 90, Name = "Guatemala", Alpha2 = "GT" },
+            new CountryCodes { Id = 91, Name = "Guernsey", Alpha2 = "GG" },
+            new CountryCodes { Id = 92, Name = "Guinea", Alpha2 = "GN" },
+            new CountryCodes { Id = 93, Name = "Guinea-Bissau", Alpha2 = "GW" },
+            new CountryCodes { Id = 94, Name = "Guyana", Alpha2 = "GY" },
+            new CountryCodes { Id = 95, Name = "Haiti", Alpha2 = "HT" },
+            new CountryCodes { Id = 96, Name = "Heard Island and McDonald Islands", Alpha2 = "HM" },
+            new CountryCodes { Id = 97, Name = "Holy See", Alpha2 = "VA" },
+            new CountryCodes { Id = 98, Name = "Honduras", Alpha2 = "HN" },
+            new CountryCodes { Id = 99, Name = "Hong Kong", Alpha2 = "HK" },
+            new CountryCodes { Id = 100, Name = "Hungary", Alpha2 = "HU" },
+            new CountryCodes { Id = 101, Name = "Iceland", Alpha2 = "IS" },
+            new CountryCodes { Id = 102, Name = "India", Alpha2 = "IN" },
+            new CountryCodes { Id = 103, Name = "Indonesia", Alpha2 = "ID" },
+            new CountryCodes { Id = 104, Name = "Iran (Islamic Republic of)", Alpha2 = "IR" },
+            new CountryCodes { Id = 105, Name = "Iraq", Alpha2 = "IQ" },
+            new CountryCodes { Id = 106, Name = "Ireland", Alpha2 = "IE" },
+            new CountryCodes { Id = 107, Name = "Isle of Man", Alpha2 = "IM" },
+            new CountryCodes { Id = 108, Name = "Israel", Alpha2 = "IL" },
+            new CountryCodes { Id = 109, Name = "Italy", Alpha2 = "IT" },
+            new CountryCodes { Id = 110, Name = "Jamaica", Alpha2 = "JM" },
+            new CountryCodes { Id = 111, Name = "Japan", Alpha2 = "JP" },
+            new CountryCodes { Id = 112, Name = "Jersey", Alpha2 = "JE" },
+            new CountryCodes { Id = 113, Name = "Jordan", Alpha2 = "JO" },
+            new CountryCodes { Id = 114, Name = "Kazakhstan", Alpha2 = "KZ" },
+            new CountryCodes { Id = 115, Name = "Kenya", Alpha2 = "KE" },
+            new CountryCodes { Id = 116, Name = "Kiribati", Alpha2 = "KI" },
+            new CountryCodes { Id = 117, Name = "Korea (Democratic People's Republic of)", Alpha2 = "KP" },
+            new CountryCodes { Id = 118, Name = "Korea (Republic of)", Alpha2 = "KR" },
+            new CountryCodes { Id = 119, Name = "Kuwait", Alpha2 = "KW" },
+            new CountryCodes { Id = 120, Name = "Kyrgyzstan", Alpha2 = "KG" },
+            new CountryCodes { Id = 121, Name = "Lao People's Democratic Republic", Alpha2 = "LA" },
+            new CountryCodes { Id = 122, Name = "Latvia", Alpha2 = "LV" },
+            new CountryCodes { Id = 123, Name = "Lebanon", Alpha2 = "LB" },
+            new CountryCodes { Id = 124, Name = "Lesotho", Alpha2 = "LS" },
+            new CountryCodes { Id = 125, Name = "Liberia", Alpha2 = "LR" },
+            new CountryCodes { Id = 126, Name = "Libya", Alpha2 = "LY" },
+            new CountryCodes { Id = 127, Name = "Liechtenstein", Alpha2 = "LI" },
+            new CountryCodes { Id = 128, Name = "Lithuania", Alpha2 = "LT" },
+            new CountryCodes { Id = 129, Name = "Luxembourg", Alpha2 = "LU" },
+            new CountryCodes { Id = 130, Name = "Macao", Alpha2 = "MO" },
+            new CountryCodes { Id = 131, Name = "Madagascar", Alpha2 = "MG" },
+            new CountryCodes { Id = 132, Name = "Malawi", Alpha2 = "MW" },
+            new CountryCodes { Id = 133, Name = "Malaysia", Alpha2 = "MY" },
+            new CountryCodes { Id = 134, Name = "Maldives", Alpha2 = "MV" },
+            new CountryCodes { Id = 135, Name = "Mali", Alpha2 = "ML" },
+            new CountryCodes { Id = 136, Name = "Malta", Alpha2 = "MT" },
+            new CountryCodes { Id = 137, Name = "Marshall Islands", Alpha2 = "MH" },
+            new CountryCodes { Id = 138, Name = "Martinique", Alpha2 = "MQ" },
+            new CountryCodes { Id = 139, Name = "Mauritania", Alpha2 = "MR" },
+            new CountryCodes { Id = 140, Name = "Mauritius", Alpha2 = "MU" },
+            new CountryCodes { Id = 141, Name = "Mayotte", Alpha2 = "YT" },
+            new CountryCodes { Id = 142, Name = "Mexico", Alpha2 = "MX" },
+            new CountryCodes { Id = 143, Name = "Micronesia (Federated States of)", Alpha2 = "FM" },
+            new CountryCodes { Id = 144, Name = "Moldova (Republic of)", Alpha2 = "MD" },
+            new CountryCodes { Id = 145, Name = "Monaco", Alpha2 = "MC" },
+            new CountryCodes { Id = 146, Name = "Mongolia", Alpha2 = "MN" },
+            new CountryCodes { Id = 147, Name = "Montenegro", Alpha2 = "ME" },
+            new CountryCodes { Id = 148, Name = "Montserrat", Alpha2 = "MS" },
+            new CountryCodes { Id = 149, Name = "Morocco", Alpha2 = "MA" },
+            new CountryCodes { Id = 150, Name = "Mozambique", Alpha2 = "MZ" },
+            new CountryCodes { Id = 151, Name = "Myanmar", Alpha2 = "MM" },
+            new CountryCodes { Id = 152, Name = "Namibia", Alpha2 = "NA" },
+            new CountryCodes { Id = 153, Name = "Nauru", Alpha2 = "NR" },
+            new CountryCodes { Id = 154, Name = "Nepal", Alpha2 = "NP" },
+            new CountryCodes { Id = 155, Name = "Netherlands", Alpha2 = "NL" },
+            new CountryCodes { Id = 156, Name = "New Caledonia", Alpha2 = "NC" },
+            new CountryCodes { Id = 157, Name = "New Zealand", Alpha2 = "NZ" },
+            new CountryCodes { Id = 158, Name = "Nicaragua", Alpha2 = "NI" },
+            new CountryCodes { Id = 159, Name = "Niger", Alpha2 = "NE" },
+            new CountryCodes { Id = 160, Name = "Nigeria", Alpha2 = "NG" },
+            new CountryCodes { Id = 161, Name = "Niue", Alpha2 = "NU" },
+            new CountryCodes { Id = 162, Name = "Norfolk Island", Alpha2 = "NF" },
+            new CountryCodes { Id = 163, Name = "North Macedonia", Alpha2 = "MK" },
+            new CountryCodes { Id = 164, Name = "Northern Mariana Islands", Alpha2 = "MP" },
+            new CountryCodes { Id = 165, Name = "Norway", Alpha2 = "NO" },
+            new CountryCodes { Id = 166, Name = "Oman", Alpha2 = "OM" },
+            new CountryCodes { Id = 167, Name = "Pakistan", Alpha2 = "PK" },
+            new CountryCodes { Id = 168, Name = "Palau", Alpha2 = "PW" },
+            new CountryCodes { Id = 169, Name = "Palestine, State of", Alpha2 = "PS" },
+            new CountryCodes { Id = 170, Name = "Panama", Alpha2 = "PA" },
+            new CountryCodes { Id = 171, Name = "Papua New Guinea", Alpha2 = "PG" },
+            new CountryCodes { Id = 172, Name = "Paraguay", Alpha2 = "PY" },
+            new CountryCodes { Id = 173, Name = "Peru", Alpha2 = "PE" },
+            new CountryCodes { Id = 174, Name = "Philippines", Alpha2 = "PH" },
+            new CountryCodes { Id = 175, Name = "Pitcairn", Alpha2 = "PN" },
+            new CountryCodes { Id = 176, Name = "Poland", Alpha2 = "PL" },
+            new CountryCodes { Id = 177, Name = "Portugal", Alpha2 = "PT" },
+            new CountryCodes { Id = 178, Name = "Puerto Rico", Alpha2 = "PR" },
+            new CountryCodes { Id = 179, Name = "Qatar", Alpha2 = "QA" },
+            new CountryCodes { Id = 180, Name = "Romania", Alpha2 = "RO" },
+            new CountryCodes { Id = 181, Name = "Russian Federation", Alpha2 = "RU" },
+            new CountryCodes { Id = 182, Name = "Rwanda", Alpha2 = "RW" },
+            new CountryCodes { Id = 183, Name = "Réunion", Alpha2 = "RE" },
+            new CountryCodes { Id = 184, Name = "Saint Barthélemy", Alpha2 = "BL" },
+            new CountryCodes { Id = 185, Name = "Saint Helena, Ascension and Tristan da Cunha", Alpha2 = "SH" },
+            new CountryCodes { Id = 186, Name = "Saint Kitts and Nevis", Alpha2 = "KN" },
+            new CountryCodes { Id = 187, Name = "Saint Lucia", Alpha2 = "LC" },
+            new CountryCodes { Id = 188, Name = "Saint Martin (French part)", Alpha2 = "MF" },
+            new CountryCodes { Id = 189, Name = "Saint Pierre and Miquelon", Alpha2 = "PM" },
+            new CountryCodes { Id = 190, Name = "Saint Vincent and the Grenadines", Alpha2 = "VC" },
+            new CountryCodes { Id = 191, Name = "Samoa", Alpha2 = "WS" },
+            new CountryCodes { Id = 192, Name = "San Marino", Alpha2 = "SM" },
+            new CountryCodes { Id = 193, Name = "Sao Tome and Principe", Alpha2 = "ST" },
+            new CountryCodes { Id = 194, Name = "Saudi Arabia", Alpha2 = "SA" },
+            new CountryCodes { Id = 195, Name = "Senegal", Alpha2 = "SN" },
+            new CountryCodes { Id = 196, Name = "Serbia", Alpha2 = "RS" },
+            new CountryCodes { Id = 197, Name = "Seychelles", Alpha2 = "SC" },
+            new CountryCodes { Id = 198, Name = "Sierra Leone", Alpha2 = "SL" },
+            new CountryCodes { Id = 199, Name = "Singapore", Alpha2 = "SG" },
+            new CountryCodes { Id = 200, Name = "Sint Maarten (Dutch part)", Alpha2 = "SX" },
+            new CountryCodes { Id = 201, Name = "Slovakia", Alpha2 = "SK" },
+            new CountryCodes { Id = 202, Name = "Slovenia", Alpha2 = "SI" },
+            new CountryCodes { Id = 203, Name = "Solomon Islands", Alpha2 = "SB" },
+            new CountryCodes { Id = 204, Name = "Somalia", Alpha2 = "SO" },
+            new CountryCodes { Id = 205, Name = "South Africa", Alpha2 = "ZA" },
+            new CountryCodes { Id = 206, Name = "South Georgia and the South Sandwich Islands", Alpha2 = "GS" },
+            new CountryCodes { Id = 207, Name = "South Sudan", Alpha2 = "SS" },
+            new CountryCodes { Id = 208, Name = "Spain", Alpha2 = "ES" },
+            new CountryCodes { Id = 209, Name = "Sri Lanka", Alpha2 = "LK" },
+            new CountryCodes { Id = 210, Name = "Sudan", Alpha2 = "SD" },
+            new CountryCodes { Id = 211, Name = "Suriname", Alpha2 = "SR" },
+            new CountryCodes { Id = 212, Name = "Svalbard and Jan Mayen", Alpha2 = "SJ" },
+            new CountryCodes { Id = 213, Name = "Sweden", Alpha2 = "SE" },
+            new CountryCodes { Id = 214, Name = "Switzerland", Alpha2 = "CH" },
+            new CountryCodes { Id = 215, Name = "Syrian Arab Republic", Alpha2 = "SY" },
+            new CountryCodes { Id = 216, Name = "Taiwan, Province of China", Alpha2 = "TW" },
+            new CountryCodes { Id = 217, Name = "Tajikistan", Alpha2 = "TJ" },
+            new CountryCodes { Id = 218, Name = "Tanzania, United Republic of", Alpha2 = "TZ" },
+            new CountryCodes { Id = 219, Name = "Thailand", Alpha2 = "TH" },
+            new CountryCodes { Id = 220, Name = "Timor-Leste", Alpha2 = "TL" },
+            new CountryCodes { Id = 221, Name = "Togo", Alpha2 = "TG" },
+            new CountryCodes { Id = 222, Name = "Tokelau", Alpha2 = "TK" },
+            new CountryCodes { Id = 223, Name = "Tonga", Alpha2 = "TO" },
+            new CountryCodes { Id = 224, Name = "Trinidad and Tobago", Alpha2 = "TT" },
+            new CountryCodes { Id = 225, Name = "Tunisia", Alpha2 = "TN" },
+            new CountryCodes { Id = 226, Name = "Turkey", Alpha2 = "TR" },
+            new CountryCodes { Id = 227, Name = "Turkmenistan", Alpha2 = "TM" },
+            new CountryCodes { Id = 228, Name = "Turks and Caicos Islands", Alpha2 = "TC" },
+            new CountryCodes { Id = 229, Name = "Tuvalu", Alpha2 = "TV" },
+            new CountryCodes { Id = 230, Name = "Uganda", Alpha2 = "UG" },
+            new CountryCodes { Id = 231, Name = "Ukraine", Alpha2 = "UA" },
+            new CountryCodes { Id = 232, Name = "United Arab Emirates", Alpha2 = "AE" },
+            new CountryCodes { Id = 233, Name = "United Kingdom of Great Britain and Northern Ireland", Alpha2 = "GB" },
+            new CountryCodes { Id = 234, Name = "United States of America", Alpha2 = "US" },
+            new CountryCodes { Id = 235, Name = "Uruguay", Alpha2 = "UY" },
+            new CountryCodes { Id = 236, Name = "Uzbekistan", Alpha2 = "UZ" },
+            new CountryCodes { Id = 237, Name = "Vanuatu", Alpha2 = "VU" },
+            new CountryCodes { Id = 238, Name = "Venezuela (Bolivarian Republic of)", Alpha2 = "VE" },
+            new CountryCodes { Id = 239, Name = "VietNam", Alpha2 = "VN" },
+            new CountryCodes { Id = 240, Name = "Western Sahara", Alpha2 = "EH" },
+            new CountryCodes { Id = 241, Name = "Yemen", Alpha2 = "YE" },
+            new CountryCodes { Id = 242, Name = "Zambia", Alpha2 = "ZM" },
+            new CountryCodes { Id = 243, Name = "Zimbabwe", Alpha2 = "ZW" },
+            new CountryCodes { Id = 244, Name = "Åland Islands", Alpha2 = "AX" },
+            new CountryCodes { Id = 245, Name = "North Korea", Alpha2 = "KP" },
+            new CountryCodes { Id = 246, Name = "South Korea", Alpha2 = "KR" }
+        };
+        return countryCodes.FirstOrDefault(x => x.Name == country);
+    }
+
+    private string GetStateCode(string state)
+    {
+        List<StateCodes> stateCodes = new List<StateCodes>()
+        {
+            new StateCodes { Id = 1, StateName = "Alabama", StateCode = "AL" },
+            new StateCodes { Id = 2, StateName = "Alaska", StateCode = "AK" },
+            new StateCodes { Id = 3, StateName = "Arizona", StateCode = "AZ" },
+            new StateCodes { Id = 4, StateName = "Arkansas", StateCode = "AR" },
+            new StateCodes { Id = 5, StateName = "American Samoa", StateCode = "AS" },
+            new StateCodes { Id = 6, StateName = "California", StateCode = "CA" },
+            new StateCodes { Id = 7, StateName = "Colorado", StateCode = "CO" },
+            new StateCodes { Id = 8, StateName = "Connecticut", StateCode = "CT" },
+            new StateCodes { Id = 9, StateName = "Delaware", StateCode = "DE" },
+            new StateCodes { Id = 10, StateName = "District of Columbia", StateCode = "DC" },
+            new StateCodes { Id = 11, StateName = "Florida", StateCode = "FL" },
+            new StateCodes { Id = 12, StateName = "Georgia", StateCode = "GA" },
+            new StateCodes { Id = 13, StateName = "Guam", StateCode = "GU" },
+            new StateCodes { Id = 14, StateName = "Hawaii", StateCode = "HI" },
+            new StateCodes { Id = 15, StateName = "Idaho", StateCode = "ID" },
+            new StateCodes { Id = 16, StateName = "Illinois", StateCode = "IL" },
+            new StateCodes { Id = 17, StateName = "Indiana", StateCode = "IN" },
+            new StateCodes { Id = 18, StateName = "Iowa", StateCode = "IA" },
+            new StateCodes { Id = 19, StateName = "Kansas", StateCode = "KS" },
+            new StateCodes { Id = 20, StateName = "Kentucky", StateCode = "KY" },
+            new StateCodes { Id = 21, StateName = "Louisiana", StateCode = "LA" },
+            new StateCodes { Id = 22, StateName = "Maine", StateCode = "ME" },
+            new StateCodes { Id = 23, StateName = "Maryland", StateCode = "MD" },
+            new StateCodes { Id = 24, StateName = "Massachusetts", StateCode = "MA" },
+            new StateCodes { Id = 25, StateName = "Michigan", StateCode = "MI" },
+            new StateCodes { Id = 26, StateName = "Minnesota", StateCode = "MN" },
+            new StateCodes { Id = 27, StateName = "Mississippi", StateCode = "MS" },
+            new StateCodes { Id = 28, StateName = "Missouri", StateCode = "MO" },
+            new StateCodes { Id = 29, StateName = "Montana", StateCode = "MT" },
+            new StateCodes { Id = 30, StateName = "Nebraska", StateCode = "NE" },
+            new StateCodes { Id = 31, StateName = "Nevada", StateCode = "NV" },
+            new StateCodes { Id = 32, StateName = "New Hampshire", StateCode = "NH" },
+            new StateCodes { Id = 33, StateName = "New Jersey", StateCode = "NJ" },
+            new StateCodes { Id = 34, StateName = "New Mexico", StateCode = "NM" },
+            new StateCodes { Id = 35, StateName = "New York", StateCode = "NY" },
+            new StateCodes { Id = 36, StateName = "North Carolina", StateCode = "NC" },
+            new StateCodes { Id = 37, StateName = "North Dakota", StateCode = "ND" },
+            new StateCodes { Id = 38, StateName = "Northern Mariana Islands", StateCode = "MP" },
+            new StateCodes { Id = 39, StateName = "Ohio", StateCode = "OH" },
+            new StateCodes { Id = 40, StateName = "Oklahoma", StateCode = "OK" },
+            new StateCodes { Id = 41, StateName = "Oregon", StateCode = "OR" },
+            new StateCodes { Id = 42, StateName = "Pennsylvania", StateCode = "PA" },
+            new StateCodes { Id = 43, StateName = "Puerto Rico", StateCode = "PR" },
+            new StateCodes { Id = 44, StateName = "Rhode Island", StateCode = "RI" },
+            new StateCodes { Id = 45, StateName = "South Carolina", StateCode = "SC" },
+            new StateCodes { Id = 46, StateName = "South Dakota", StateCode = "SD" },
+            new StateCodes { Id = 47, StateName = "Tennessee", StateCode = "TN" },
+            new StateCodes { Id = 48, StateName = "Texas", StateCode = "TX" },
+            new StateCodes { Id = 49, StateName = "Trust Territories", StateCode = "TT" },
+            new StateCodes { Id = 50, StateName = "Utah", StateCode = "UT" },
+            new StateCodes { Id = 51, StateName = "Vermont", StateCode = "VT" },
+            new StateCodes { Id = 52, StateName = "Virginia", StateCode = "VA" },
+            new StateCodes { Id = 53, StateName = "Virgin Islands", StateCode = "VI" },
+            new StateCodes { Id = 54, StateName = "Washington", StateCode = "WA" },
+            new StateCodes { Id = 55, StateName = "West Virginia", StateCode = "WV" },
+            new StateCodes { Id = 56, StateName = "Wisconsin", StateCode = "WI" },
+            new StateCodes { Id = 57, StateName = "Wyoming", StateCode = "WY" }
+        };
+        return stateCodes.FirstOrDefault(x => x.StateName == state).StateCode;
     }
 }

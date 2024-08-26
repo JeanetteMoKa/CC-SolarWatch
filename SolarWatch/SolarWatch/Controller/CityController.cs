@@ -57,7 +57,7 @@ public class CityController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, "Error getting coordinates");
-            return NotFound("Error getting coordinates");
+            return NotFound($"Error getting coordinates {e.Message}");
         }
     }
 

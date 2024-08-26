@@ -47,7 +47,6 @@ public class SolarDataController : ControllerBase
     {
         try
         {
-            Console.WriteLine($"Received date: {date}"); // Log the date for debugging
             var city = await _cityRepository.GetByName(cityName, countryName, stateName);
 
             if (city == null)

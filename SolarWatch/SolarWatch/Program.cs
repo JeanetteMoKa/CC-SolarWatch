@@ -115,12 +115,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// using (var scope = app.Services.CreateScope())
-// {
-//         var authenticationSeeder = scope.ServiceProvider.GetRequiredService<AuthenticationSeeder>();
-//         await authenticationSeeder.AddRoles();
-//         authenticationSeeder.AddAdmin();
-// }
 using (var scope = app.Services.CreateScope())
 {
     try
