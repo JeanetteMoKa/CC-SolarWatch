@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolarWatch_Tests", "SolarWa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B3CEC35E-5797-4D38-BE92-E8BDB4C0E5ED}"
 	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
+		docker-compose-pattern.yml = docker-compose-pattern.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolarWatch_IntegrationTest", "SolarWatch_IntegrationTest\SolarWatch_IntegrationTest.csproj", "{C6555324-391E-458D-BA7F-4F2C80A28E9F}"
