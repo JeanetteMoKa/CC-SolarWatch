@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'url'
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -10,6 +11,11 @@ const backendUrl = isDevelopment
 
 const defaultConfig = {
   plugins: [react()],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      }
+    }
 }
 
 // https://vitejs.dev/config/
