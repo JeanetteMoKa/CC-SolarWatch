@@ -29,7 +29,7 @@ Solar Watch is a lightweight sunset/sunrise checking web app. It was the advance
 - with each user request the time zone of the location is sent together with the solar date in a combined DTO on the frontend this data is used to convert the time, that is first shown in the user's system timezone, to local time
 
 # Installation   
-If you'd like to see the deployed version you can visit [here](https://solarwatchfrontend-fzg9gec4dqd4gegx.polandcentral-01.azurewebsites.net/) hosted on Microsoft Azure. 
+If you'd like to see the deployed version you can visit [here](https://solarwatchfrontend-fzg9gec4dqd4gegx.polandcentral-01.azurewebsites.net/) hosted on Microsoft Azure. (disabled until further notice)
 
 If you'd like to install and run the development version, you're going to need to take the following steps:
 1. Prerequisites:
